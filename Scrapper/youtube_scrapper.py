@@ -5,11 +5,13 @@ from pytube import YouTube
 import configparser
 import pathlib
 from dataset_to_parse import youtube_channel_ids
+from aws import push_stream_to_s3
 
 config_path = pathlib.Path(__file__).parent.absolute() / "config.ini"
 config = configparser.ConfigParser()
 config.read(config_path)
 API_KEY = config["YoutubeAPI"]["API_KEY"]
+BUCKET_NAME = config["AppConfig"]["BUCKET_NAME"]
 
 
 class YoutubeScrapper(Scrapper):
@@ -23,7 +25,10 @@ class YoutubeScrapper(Scrapper):
     def scrap(self, max_results: int = 50):
         video_ids = YoutubeScrapper.get_youtube_video_list(self.user_id, max_results)
         for video_id in video_ids:
-            YoutubeScrapper.get_audio(video_id,output_path=f"../audios/{self.user_id}")
+            audio = YoutubeScrapper.get_audio(
+                video_id, output_path=f"../audios/{self.user_id}"
+            )
+            push_stream_to_s3(audio, BUCKET_NAME, video_id)
 
     @staticmethod
     def get_youtube_video_list(channel_id, max_count=50):
@@ -42,7 +47,7 @@ class YoutubeScrapper(Scrapper):
                     type="video",
                     maxResults=50,
                     pageToken=next_page_token,
-                    order = "viewCount"
+                    order="viewCount",
                 )
                 .execute()
             )
@@ -70,21 +75,12 @@ class YoutubeScrapper(Scrapper):
         return videos
 
     @staticmethod
-    def get_audio(
-        video_id: str, audio_extension: str = "mp3", output_path="../audios"
-    ) -> bool:
-        print("wOW")
+    def get_audio(video_id: str, output_path="../audios") -> bool:
         youtube_url = f'https://www.youtube.com/watch?v={video_id}"'
         try:
             video = YouTube(youtube_url)
-            audio = video.streams.filter(only_audio=True, file_extension="mp3").first()
-            audio.download(output_path=output_path)
-            return True
+            audio = video.streams.filter(only_audio=True).first()
+            return audio
         except Exception as err:
             print(repr(err))
-            return False
-
-
-for value in youtube_channel_ids.values():
-    youtube = YoutubeScrapper(value)
-    youtube.scrap(100)
+            return None

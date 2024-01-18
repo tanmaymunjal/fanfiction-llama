@@ -1,7 +1,7 @@
 youtube_channel_ids = {
-    "PRSundar64":"UCS2NdYUmv_PUyyKeDAo5zYA",
-    "pranjalkamra":"UCwAdQUuPT6laN-AQR17fe1g",
-    "LabourLawAdvisor":"UCVOTBwF0vnSxMRIbfSE_K_g",
+    "PRSundar64": "UCS2NdYUmv_PUyyKeDAo5zYA",
+    "pranjalkamra": "UCwAdQUuPT6laN-AQR17fe1g",
+    "LabourLawAdvisor": "UCVOTBwF0vnSxMRIbfSE_K_g",
     "rachanaphadke": "UCe3qdG0A_gr-sEdat5y2twQ",
     "AssetYogi": "UCsNxHPbaCWL1tKw2hxGQD6g",
     "ManojkumarJain": "UCHXTbd8Av-HR3Yng65dfCZg",
@@ -17,5 +17,5 @@ youtube_channel_ids = {
     "Groww": "UCw5TLrz3qADabwezTEcOmgQ",
     "MOFSL": "UCk8EZaxKvAi1a5AEe4Hobmg",
     "ICICIPrudentialAMC": "UClGyZZrTsCNqUl99morKSXQ",
-    "Nuvama_Wealth": "UC0ik1TOToNoGQdPsZlDfVPA"
+    "Nuvama_Wealth": "UC0ik1TOToNoGQdPsZlDfVPA",
 }
