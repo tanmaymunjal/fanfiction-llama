@@ -25,10 +25,12 @@ class YoutubeScrapper(Scrapper):
     def scrap(self, max_results: int = 50):
         video_ids = YoutubeScrapper.get_youtube_video_list(self.user_id, max_results)
         for video_id in video_ids:
-            audio = YoutubeScrapper.get_audio(
-                video_id, output_path=f"../audios/{self.user_id}"
-            )
-            push_stream_to_s3(audio, BUCKET_NAME, video_id)
+            audio = YoutubeScrapper.get_audio(video_id)
+            success = push_stream_to_s3(audio, BUCKET_NAME, self.user_id)
+            if success is not None:
+                print(f"Logged s3 push: {video_id}")
+            else:
+                print(f"Logged s3 push faliure: {video_id}")
 
     @staticmethod
     def get_youtube_video_list(channel_id, max_count=50):
@@ -54,33 +56,29 @@ class YoutubeScrapper(Scrapper):
 
             video_ids = [item["id"]["videoId"] for item in search_response["items"]]
 
-            videos_response = (
-                youtube.videos().list(part="snippet", id=",".join(video_ids)).execute()
-            )
-
-            for video in videos_response["items"]:
-                videos.append(video["id"])
-
-                # Break the loop if the maximum count is reached
-                if max_count is not None and len(videos) >= max_count:
-                    break
-
             next_page_token = search_response.get("nextPageToken")
 
             if not next_page_token or (
-                max_count is not None and len(videos) >= max_count
+                max_count is not None and len(video_ids) >= max_count
             ):
                 break
 
-        return videos
+        return video_ids
 
     @staticmethod
-    def get_audio(video_id: str, output_path="../audios") -> bool:
+    def get_audio(video_id: str) -> bool:
         youtube_url = f'https://www.youtube.com/watch?v={video_id}"'
         try:
             video = YouTube(youtube_url)
             audio = video.streams.filter(only_audio=True).first()
-            return audio
+            if audio.filesize_mb >3:
+                return audio
+            return None
         except Exception as err:
             print(repr(err))
             return None
+
+
+for video_id in youtube_channel_ids.values():
+    youtube_scrapper = YoutubeScrapper(video_id)
+    youtube_scrapper.scrap(10)
