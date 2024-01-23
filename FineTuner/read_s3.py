@@ -32,12 +32,14 @@ for page in pages:
         if obj["Key"].endswith(".mp3"):
             # Download the binary content of the MP3 file
             response = s3.get_object(Bucket="financialcontenthindi-raw", Key=obj["Key"])["Body"].read()
-            # local_file_path = os.path.join(local_folder, str(i))+".mp4"
-            # i+=1
-            # with open(local_file_path, 'wb+') as local_file:
-            #     local_file.write(response)
-            # audio_data, _ = librosa.load(local_file_path)
-            data.append([response,obj["Key"]])
+            local_file_path = os.path.join(local_folder, str(i))+".mp4"
+            i+=1
+            if i==10:
+                break
+            with open(local_file_path, 'wb+') as local_file:
+                local_file.write(response)
+            audio_data, _ = librosa.load(local_file_path)
+            data.append([audio_data,obj["Key"]])
 
 def delete_local_files(local_folder):
     # Delete local files
