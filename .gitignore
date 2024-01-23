@@ -162,4 +162,4 @@ cython_debug/
 # ignore config files
 *.ini
 
-Audios/git
+Audios/
