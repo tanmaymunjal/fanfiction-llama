@@ -7,5 +7,5 @@ distributed_state = PartialState()
 model.to(distributed_state.device)
 
 with distributed_state.split_between_processes(data) as prompt:
-    result = asr_pipeline(prompt[0])
+    result = model(prompt[0])
     result.save(f"result_{prompt[1]}.txt")

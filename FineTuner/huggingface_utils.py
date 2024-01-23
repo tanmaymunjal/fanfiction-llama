@@ -8,10 +8,3 @@ model = AutoModelForSpeechSeq2Seq.from_pretrained(
 )
 
 processor = AutoProcessor.from_pretrained(model_id)
-asr_pipeline = pipeline(
-    "automatic-speech-recognition",
-    model=model,
-    tokenizer=processor.tokenizer,
-    feature_extractor=processor.feature_extractor,
-    torch_dtype=torch_dtype,
-)
