@@ -1,20 +1,17 @@
 import torch
-import librosa
-from transformers import pipeline
+from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-
-asr_pipeline = pipeline(
-    "automatic-speech-recognition",
-    model="openai/whisper-medium",
-    torch_dtype=torch.float16,
-    chunk_length_s=30,
-    return_timestamps=False,
-    use_safetensors = True
+model_id = "openai/whisper-medium"
+model = AutoModelForSpeechSeq2Seq.from_pretrained(
+    model_id, torch_dtype=torch_dtype, use_safetensors=True
 )
 
-text_pipeline = pipeline(
-    "question-answering",
-    model="sarvamai/OpenHathi-7B-Hi-v0.1-Base",
-    torch_dtype=torch.float16,
-    use_safetensors = True
+processor = AutoProcessor.from_pretrained(model_id)
+asr_pipeline = pipeline(
+    "automatic-speech-recognition",
+    model=model,
+    tokenizer=processor.tokenizer,
+    feature_extractor=processor.feature_extractor,
+    torch_dtype=torch_dtype,
 )
